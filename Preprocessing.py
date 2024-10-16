@@ -19,7 +19,7 @@ def regex_cleaner(raw_text,
             no_urls = True,
             no_punctuation = True):
     
-    #patterns
+    #patterns 
     newline_pattern = "(\\n)"
     hashtags_at_pattern = "([#\@@\u0040\uFF20\uFE6B])"
     hashtags_ats_and_word_pattern = "([#@]\w+)"
