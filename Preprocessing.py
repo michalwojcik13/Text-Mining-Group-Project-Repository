@@ -12,12 +12,12 @@ from nltk.tokenize.treebank import TreebankWordDetokenizer
 
 
 def regex_cleaner(raw_text, 
-            no_emojis = True, 
-            no_hashtags = True,
-            hashtag_retain_words = True,
-            no_newlines = True,
-            no_urls = True,
-            no_punctuation = True):
+            no_emojis, 
+            no_hashtags,
+            hashtag_retain_words,
+            no_newlines,
+            no_urls,
+            no_punctuation):
     
     #patterns 
     newline_pattern = "(\\n)"
@@ -61,6 +61,12 @@ def lemmatize_all(token, list_pos=["n","v","a","r","s"]):
     return token
 
 def main_pipeline(raw_text, 
+                  no_emojis = True,
+                  no_hashtags = True,
+                  hashtag_retain_words = True,
+                  no_newlines = True,
+                  no_urls = True,
+                  no_punctuation = True,
                   print_output = True, 
                   no_stopwords = True,
                   custom_stopwords = [],
@@ -75,7 +81,14 @@ def main_pipeline(raw_text,
     
     """Preprocess strings according to the parameters"""
 
-    clean_text = regex_cleaner(raw_text, **kwargs)
+    clean_text = regex_cleaner(raw_text, 
+                               no_emojis=no_emojis,
+                               no_hashtags=no_hashtags,
+                               hashtag_reatin_words=hashtag_retain_words,
+                               no_newlines=no_newlines,
+                               no_urls=no_urls,
+                               no_punctuation=no_punctuation,
+                                 **kwargs)
     tokenized_text = nltk.tokenize.word_tokenize(clean_text)
 
     tokenized_text = [re.sub("'m","am",token) for token in tokenized_text]
