@@ -10,7 +10,6 @@ from tqdm import tqdm
 from unidecode import unidecode
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 
-
 def regex_cleaner(raw_text, 
             no_emojis, 
             no_hashtags,
@@ -84,7 +83,7 @@ def main_pipeline(raw_text,
     clean_text = regex_cleaner(raw_text, 
                                no_emojis=no_emojis,
                                no_hashtags=no_hashtags,
-                               hashtag_reatin_words=hashtag_retain_words,
+                               hashtag_retain_words=hashtag_retain_words,
                                no_newlines=no_newlines,
                                no_urls=no_urls,
                                no_punctuation=no_punctuation,
