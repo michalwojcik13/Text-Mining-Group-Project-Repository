@@ -4,6 +4,7 @@ import re
 import nltk
 import pandas as pd
 import numpy as np
+import contractions as contr
 
 from collections import defaultdict, Counter
 from tqdm import tqdm
@@ -16,7 +17,8 @@ def regex_cleaner(raw_text,
             hashtag_retain_words,
             no_newlines,
             no_urls,
-            no_punctuation):
+            no_punctuation,
+            remove_contractions):
     
     #patterns 
     newline_pattern = "(\\n)"
@@ -27,8 +29,11 @@ def regex_cleaner(raw_text,
     punctuation_pattern = "[\u0021-\u0026\u0028-\u002C\u002E-\u002F\u003A-\u003F\u005B-\u005F\u2010-\u2028\ufeff`]+"
     apostrophe_pattern = "'(?=[A-Z\s])|(?<=[a-z\.\?\!\,\s])'"
     separated_words_pattern = "(?<=\w\s)([A-Z]\s){2,}"
-    ##note that this punctuation_pattern doesn't capture ' this time to allow our tokenizer to separate "don't" into ["do", "n't"]
     
+    ##note that this punctuation_pattern doesn't capture ' this time to allow our tokenizer to separate "don't" into ["do", "n't"]
+    if remove_contractions == True:
+        raw_text = contr.fix(raw_text)
+
     if no_emojis == True:
         clean_text = re.sub(emojis_pattern,"",raw_text)
     else:
@@ -66,6 +71,7 @@ def main_pipeline(raw_text,
                   no_newlines = True,
                   no_urls = True,
                   no_punctuation = True,
+                  remove_contractions = True,
                   print_output = True, 
                   no_stopwords = True,
                   custom_stopwords = [],
@@ -87,6 +93,7 @@ def main_pipeline(raw_text,
                                no_newlines=no_newlines,
                                no_urls=no_urls,
                                no_punctuation=no_punctuation,
+                               remove_contractions=remove_contractions,
                                  **kwargs)
     tokenized_text = nltk.tokenize.word_tokenize(clean_text)
 
