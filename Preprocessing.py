@@ -12,7 +12,8 @@ def regex_cleaner(raw_text,
                   hashtag_retain_words,
                   no_newlines,
                   no_urls,
-                  no_punctuation):
+                  no_punctuation,
+                  no_emojis):
     # Patterns for specific elements, ensuring emojis remain intact
     newline_pattern = "(\\n)"
     hashtags_at_pattern = "([#\@@@＠﹫])"
@@ -41,6 +42,9 @@ def regex_cleaner(raw_text,
         # Remove punctuation but leave emojis intact
         clean_text = re.sub(punctuation_pattern, "", clean_text)
         clean_text = re.sub(apostrophe_pattern, "", clean_text)
+        
+    if no_emojis == True:
+        clean_text = re.sub(emoji_pattern, "", clean_text)
 
     return clean_text
 
@@ -81,7 +85,7 @@ def add_space_after_punctuation(text):
     return text
 
 # Function to lemmatize all tokens
-def lemmatize_all(text, list_pos=["n", "v", "a", "r", "s"]):
+def lemmatize_all(text, list_pos):
     lemmatized_text = []
     for token in text.split():
         for pos in list_pos:
@@ -98,11 +102,11 @@ def main_pipeline(raw_text,
                   no_punctuation=True,
                   print_output=True, 
                   no_stopwords=False,
-                  custom_stopwords=[],
                   lowercase=True, 
                   lemmatized=True,
+                  list_pos=["n", "v", "a", "r", "s"],
                   stemmed=False, 
-                  pos_tags_list="no_pos",
+                  no_emojis = True,
                   **kwargs):
     """Preprocess strings according to the parameters"""
 
@@ -125,6 +129,7 @@ def main_pipeline(raw_text,
                                no_newlines=no_newlines,
                                no_urls=no_urls,
                                no_punctuation=no_punctuation,
+                               no_emojis=no_emojis,
                                **kwargs)
     
     clean_text = re.sub(r"'m", " am", clean_text)
@@ -136,7 +141,7 @@ def main_pipeline(raw_text,
     #clean_text = re.sub(r"\.(?=\w)", ". ", clean_text)  # Ensure space after period
 
     if lemmatized == True:
-        clean_text = lemmatize_all(clean_text)
+        clean_text = lemmatize_all(clean_text,["n", "v", "a", "r", "s"])
 
     if stemmed == True:
         porterstemmer = nltk.stem.PorterStemmer()
@@ -145,6 +150,10 @@ def main_pipeline(raw_text,
     if lowercase == True:
         clean_text = clean_text.lower()
 
+    if no_stopwords == True:
+        stopwords = nltk.corpus.stopwords.words('english')
+        clean_text = ' '.join([word for word in clean_text.split() if word not in stopwords])
+        
     if print_output == True:
         print(raw_text)
         print(clean_text)
