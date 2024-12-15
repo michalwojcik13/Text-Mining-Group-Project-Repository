@@ -18,7 +18,8 @@ def regex_cleaner(raw_text,
             no_newlines,
             no_urls,
             no_punctuation,
-            remove_contractions):
+            remove_contractions,
+            no_numbers):
     
     #patterns 
     newline_pattern = "(\\n)"
@@ -29,6 +30,7 @@ def regex_cleaner(raw_text,
     punctuation_pattern = "[\u0021-\u0026\u0028-\u002C\u002E-\u002F\u003A-\u003F\u005B-\u005F\u2010-\u2028\ufeff`]+"
     apostrophe_pattern = "'(?=[A-Z\s])|(?<=[a-z\.\?\!\,\s])'"
     separated_words_pattern = "(?<=\w\s)([A-Z]\s){2,}"
+    numbers_pattern = "\d+"
     
     ##note that this punctuation_pattern doesn't capture ' this time to allow our tokenizer to separate "don't" into ["do", "n't"]
     if remove_contractions == True:
@@ -55,6 +57,8 @@ def regex_cleaner(raw_text,
         clean_text = re.sub(punctuation_pattern,"",clean_text)
         clean_text = re.sub(apostrophe_pattern,"",clean_text)
 
+    if no_numbers == True:
+        clean_text = re.sub(numbers_pattern, '', clean_text)
     return clean_text
 
 def lemmatize_all(token, list_pos=["n","v","a","r","s"]):
@@ -70,10 +74,11 @@ def main_pipeline(raw_text,
                   hashtag_retain_words = True,
                   no_newlines = True,
                   no_urls = True,
-                  no_punctuation = True,
+                  no_punctuation = False,
+                  no_numbers = True,
                   remove_contractions = True,
-                  print_output = True, 
-                  no_stopwords = True,
+                  print_output = False, 
+                  no_stopwords = False,
                   custom_stopwords = [],
                   convert_diacritics = True, 
                   lowercase = True, 
@@ -94,6 +99,7 @@ def main_pipeline(raw_text,
                                no_urls=no_urls,
                                no_punctuation=no_punctuation,
                                remove_contractions=remove_contractions,
+                               no_numbers=no_numbers,
                                  **kwargs)
     tokenized_text = nltk.tokenize.word_tokenize(clean_text)
 
@@ -141,43 +147,3 @@ def main_pipeline(raw_text,
             detokenizer = TreebankWordDetokenizer()
             detokens = detokenizer.detokenize(tokenized_text)
             return str(detokens)
-        
-
-def cooccurrence_matrix_sentence_generator(preproc_sentences, sentence_cooc=False, window_size=5):
-
-    co_occurrences = defaultdict(Counter)
-
-    # Compute co-occurrences
-    if sentence_cooc == True:
-        for sentence in tqdm(preproc_sentences):
-            for token_1 in sentence:
-                for token_2 in sentence:
-                    if token_1 != token_2:
-                        co_occurrences[token_1][token_2] += 1
-    else:
-        for sentence in tqdm(preproc_sentences):
-            for i, word in enumerate(sentence):
-                for j in range(max(0, i - window_size), min(len(sentence), i + window_size + 1)):
-                    if i != j:
-                        co_occurrences[word][sentence[j]] += 1
-
-    #ensure that words are unique
-    unique_words = list(set([word for sentence in preproc_sentences for word in sentence]))
-
-    # Initialize the co-occurrence matrix
-    co_matrix = np.zeros((len(unique_words), len(unique_words)), dtype=int)
-
-    # Populate the co-occurrence matrix
-    word_index = {word: idx for idx, word in enumerate(unique_words)}
-    for word, neighbors in co_occurrences.items():
-        for neighbor, count in neighbors.items():
-            co_matrix[word_index[word]][word_index[neighbor]] = count
-
-    # Create a DataFrame for better readability
-    co_matrix_df = pd.DataFrame(co_matrix, index=unique_words, columns=unique_words)
-
-    co_matrix_df = co_matrix_df.reindex(co_matrix_df.sum().sort_values(ascending=False).index, axis=1)
-    co_matrix_df = co_matrix_df.reindex(co_matrix_df.sum().sort_values(ascending=False).index, axis=0)
-
-    # Return the co-occurrence matrix
-    return co_matrix_df
