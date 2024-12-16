@@ -1,0 +1,19 @@
+TRANSFORMER:,,,,
+,,,,
+,precision,recall,f1-score,support
+Negative,0.80,0.86,0.83,2428.00
+Neutral,0.29,0.14,0.19,1258.00
+Positive,0.89,0.95,0.92,6268.00
+accuracy,0.83,0.83,0.83,0.83
+macro avg,0.66,0.65,0.65,9954.00
+weighted avg,0.79,0.83,0.80,9954.00
+,,,,
+VADER:,,,,
+,,,,
+,precision,recall,f1-score,support
+Negative,0.84,0.63,0.72,2428.00
+Neutral,0.17,0.10,0.12,1258.00
+Positive,0.80,0.94,0.86,6268.00
+accuracy,0.76,0.76,0.76,0.76
+macro avg,0.60,0.56,0.57,9954.00
+weighted avg,0.73,0.76,0.73,9954.00
